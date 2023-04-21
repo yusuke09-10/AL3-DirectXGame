@@ -8,6 +8,7 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "MathUtilityForText.h"
 
 /// <summary>
 /// ゲームシーン
@@ -34,7 +35,7 @@ public: // メンバ関数
 	/// 毎フレーム処理
 	/// </summary>
 	void Update();
-
+	void PlayerUpdate();
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -48,4 +49,17 @@ private: // メンバ変数
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	//Bg
+	uint32_t textureHandelBg_ = 0;
+	Sprite* spriteBg_ = nullptr;
+	ViewProjection viewprojection_;
+	//stage
+	uint32_t textureHandleStage_ = 0;
+	Model* modelstage_ = nullptr;
+	WorldTransform worldTransformStage_;
+	//Player
+	uint32_t textureHandlePlayer_ = 0;
+	Model* modelPlayer_ = nullptr;
+	WorldTransform worldTransformPlayer_;
+
 };
