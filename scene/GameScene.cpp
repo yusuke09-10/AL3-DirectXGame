@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
+#include <time.h>
 //コンストラクタ
 GameScene::GameScene() {}
 //デストラクタ
@@ -9,6 +10,7 @@ GameScene::~GameScene() {
 	delete modelstage_;
 	delete modelPlayer_;
 	delete modelBeem_;
+	delete modelEnemy_;
 }
 //初期化
 void GameScene::Initialize() {
@@ -45,13 +47,19 @@ void GameScene::Initialize() {
 	modelBeem_ = Model::Create();
 	worldTransformBeem_.scale_ = {0.3f, 0.3f, 0.3f};
 	worldTransformBeem_.Initialize();
+	//Enemy
+	textureHandleEnemy_ = TextureManager::Load("enemy.png");
+	modelEnemy_ = Model::Create();
+	worldTransformEnemy_.scale_ = {0.5f, 0.5f, 0.5f};
+	worldTransformEnemy_.Initialize();
+	srand((unsigned int)time(NULL));
 }
 //更新
 void GameScene::Update() {
 	PlayerUpdate();
 	BeemUpdate();
+	EnemyUpdate();
 }
-
 //Player Update
 void GameScene::PlayerUpdate() {
 	// Move
@@ -105,6 +113,35 @@ void GameScene::BeemBorn() {
 		}
 	}
 }
+// EnemyUpdate
+void GameScene::EnemyUpdate() {
+	EnemyMove();
+	EnemyBorn();
+	// 変換行列を更新
+	worldTransformEnemy_.matWorld_ = MakeAffineMatrix(
+	    worldTransformEnemy_.scale_, worldTransformEnemy_.rotation_,
+	    worldTransformEnemy_.translation_);
+	// バッファ転送
+	worldTransformEnemy_.TransferMatrix();
+}
+void GameScene::EnemyMove() {
+	if (EnemyFlag_ == 1) {
+		worldTransformEnemy_.rotation_.x -= 0.1f;
+		worldTransformEnemy_.translation_.z -= 0.3f;
+	}
+	if (worldTransformEnemy_.translation_.z < -5) {
+		EnemyFlag_ = 0;
+	}
+}
+void GameScene::EnemyBorn() {
+	int x = rand() % 80;
+	float x2 = (float)x / 10 - 4;
+	if (EnemyFlag_ == 0) {
+		worldTransformEnemy_.translation_.x = x2;
+		worldTransformEnemy_.translation_.z = 40.0f;
+		EnemyFlag_ = 1;
+	}
+}
     //描画
 void GameScene::Draw() {
 
@@ -137,6 +174,9 @@ void GameScene::Draw() {
 	modelPlayer_->Draw(worldTransformPlayer_, viewprojection_, textureHandlePlayer_);
 	if (BeemFlag_ == 1) {
 		modelBeem_->Draw(worldTransformBeem_, viewprojection_, textureHandleBeem_);
+	}
+	if (EnemyFlag_ == 1) {
+        modelEnemy_->Draw(worldTransformEnemy_, viewprojection_, textureHandleEnemy_);
 	}
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
