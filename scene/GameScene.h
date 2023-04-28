@@ -36,6 +36,9 @@ public: // メンバ関数
 	/// </summary>
 	void Update();
 	void PlayerUpdate();
+	void BeemUpdate();
+	void BeemMove();
+	void BeemBorn();
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -61,5 +64,9 @@ private: // メンバ変数
 	uint32_t textureHandlePlayer_ = 0;
 	Model* modelPlayer_ = nullptr;
 	WorldTransform worldTransformPlayer_;
-
+	// Beem
+	uint32_t textureHandleBeem_ = 0;
+	Model* modelBeem_ = nullptr;
+	WorldTransform worldTransformBeem_;
+	int BeemFlag_ = 0;
 };

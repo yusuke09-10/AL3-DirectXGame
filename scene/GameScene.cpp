@@ -8,6 +8,7 @@ GameScene::~GameScene() {
 	delete spriteBg_;
 	delete modelstage_;
 	delete modelPlayer_;
+	delete modelBeem_;
 }
 //初期化
 void GameScene::Initialize() {
@@ -39,9 +40,17 @@ void GameScene::Initialize() {
 	modelPlayer_ = Model::Create();
 	worldTransformPlayer_.scale_ = {0.5f, 0.5f, 0.5f};
 	worldTransformPlayer_.Initialize();
+	//Beem
+	textureHandleBeem_ = TextureManager::Load("beam.png");
+	modelBeem_ = Model::Create();
+	worldTransformBeem_.scale_ = {0.3f, 0.3f, 0.3f};
+	worldTransformBeem_.Initialize();
 }
 //更新
-void GameScene::Update() { PlayerUpdate(); }
+void GameScene::Update() {
+	PlayerUpdate();
+	BeemUpdate();
+}
 
 //Player Update
 void GameScene::PlayerUpdate() {
@@ -67,7 +76,36 @@ void GameScene::PlayerUpdate() {
 	// playerバッファ転送
 	worldTransformPlayer_.TransferMatrix();
 }
-//描画
+// Beem Update
+void GameScene::BeemUpdate() {
+	BeemMove();
+	BeemBorn();
+	// 変換行列を更新
+	worldTransformBeem_.matWorld_ = MakeAffineMatrix(
+	    worldTransformBeem_.scale_, worldTransformBeem_.rotation_,
+	    worldTransformBeem_.translation_);
+	// バッファ転送
+	worldTransformBeem_.TransferMatrix();
+}
+void GameScene::BeemMove() {
+	if (BeemFlag_ == 1) {
+		worldTransformBeem_.rotation_.x += 0.1f;
+	worldTransformBeem_.translation_.z += 0.1f;}
+	if (worldTransformBeem_.translation_.z > 40) {
+	BeemFlag_ = 0;
+	}
+}
+void GameScene::BeemBorn() {
+	if (BeemFlag_ == 0) {
+		if (input_->PushKey(DIK_SPACE)) {
+			worldTransformBeem_.translation_.x = worldTransformPlayer_.translation_.x;
+			worldTransformBeem_.translation_.y = worldTransformPlayer_.translation_.y;
+			worldTransformBeem_.translation_.z = worldTransformPlayer_.translation_.z;
+			BeemFlag_ = 1;
+		}
+	}
+}
+    //描画
 void GameScene::Draw() {
 
 	// コマンドリストの取得
@@ -97,6 +135,9 @@ void GameScene::Draw() {
 	/// </summary>
 	modelstage_->Draw(worldTransformStage_, viewprojection_, textureHandleStage_);
 	modelPlayer_->Draw(worldTransformPlayer_, viewprojection_, textureHandlePlayer_);
+	if (BeemFlag_ == 1) {
+		modelBeem_->Draw(worldTransformBeem_, viewprojection_, textureHandleBeem_);
+	}
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
