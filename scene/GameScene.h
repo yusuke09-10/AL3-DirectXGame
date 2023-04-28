@@ -9,6 +9,7 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "MathUtilityForText.h"
+#include "DebugText.h"
 
 /// <summary>
 /// ゲームシーン
@@ -42,6 +43,9 @@ public: // メンバ関数
 	void EnemyUpdate();
 	void EnemyMove();
 	void EnemyBorn();
+	void Collision();
+	void CollisionPlayerEnemy();
+	void CollisionBeem();
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -77,4 +81,7 @@ private: // メンバ変数
 	Model* modelEnemy_ = nullptr;
 	WorldTransform worldTransformEnemy_;
 	int EnemyFlag_ = 0;
+	int GameScore_ = 0;
+	int Playerlife_ = 3;
+	DebugText* debugtext_ = nullptr;
 };

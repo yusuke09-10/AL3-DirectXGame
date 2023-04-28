@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 #include <cassert>
 #include <time.h>
+
 //コンストラクタ
 GameScene::GameScene() {}
 //デストラクタ
@@ -53,12 +54,16 @@ void GameScene::Initialize() {
 	worldTransformEnemy_.scale_ = {0.5f, 0.5f, 0.5f};
 	worldTransformEnemy_.Initialize();
 	srand((unsigned int)time(NULL));
+	//Debug
+	debugtext_ = DebugText::GetInstance();
+	debugtext_->Initialize();
 }
 //更新
 void GameScene::Update() {
 	PlayerUpdate();
 	BeemUpdate();
 	EnemyUpdate();
+	Collision();
 }
 //Player Update
 void GameScene::PlayerUpdate() {
@@ -98,7 +103,7 @@ void GameScene::BeemUpdate() {
 void GameScene::BeemMove() {
 	if (BeemFlag_ == 1) {
 		worldTransformBeem_.rotation_.x += 0.1f;
-	worldTransformBeem_.translation_.z += 0.1f;}
+	worldTransformBeem_.translation_.z += 0.4f;}
 	if (worldTransformBeem_.translation_.z > 40) {
 	BeemFlag_ = 0;
 	}
@@ -142,6 +147,30 @@ void GameScene::EnemyBorn() {
 		EnemyFlag_ = 1;
 	}
 }
+//HitBox
+void GameScene::Collision() { CollisionPlayerEnemy();
+	CollisionBeem();
+}
+void GameScene::CollisionPlayerEnemy() { 
+	if (EnemyFlag_==1) {
+		float dx = abs(worldTransformPlayer_.translation_.x - worldTransformEnemy_.translation_.x);
+		float dz = abs(worldTransformPlayer_.translation_.z - worldTransformEnemy_.translation_.z);
+		if (dx < 1 && dz < 1) {
+			EnemyFlag_ = 0;
+			Playerlife_ -= 1;
+		}
+	}
+}
+void GameScene::CollisionBeem() {
+	if (EnemyFlag_ == 1) {
+		float dx = abs(worldTransformBeem_.translation_.x - worldTransformEnemy_.translation_.x);
+		float dz = abs(worldTransformBeem_.translation_.z - worldTransformEnemy_.translation_.z);
+		if (dx < 1 && dz < 1) {
+			EnemyFlag_ = 0;
+			GameScore_ += 1;
+		}
+	}
+}
     //描画
 void GameScene::Draw() {
 
@@ -156,7 +185,14 @@ void GameScene::Draw() {
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
 	spriteBg_->Draw();
-
+	//score
+	char str[100];
+	char Lstr[100];
+	sprintf_s(str, "SCORE:%d", GameScore_);
+	debugtext_->Print(str, 10, 10, 2);
+	sprintf_s(Lstr, "LIFE:%d", Playerlife_);
+	debugtext_->Print(Lstr, 700, 10, 2);
+	debugtext_->DrawAll();
 	// スプライト描画後処理
 	Sprite::PostDraw();
 	// 深度バッファクリア
