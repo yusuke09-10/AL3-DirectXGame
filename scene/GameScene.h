@@ -46,6 +46,16 @@ public: // メンバ関数
 	void Collision();
 	void CollisionPlayerEnemy();
 	void CollisionBeem();
+	//
+	void GamePlayStart();
+	void GamePlayUpdate();
+	void GamePlayDrow3D();
+	void GamePlayDrow2DBack();
+	void GamePlayDrow2DFront();
+	void TitleUpdate();
+	void TitleDrow2DFront();
+	void GameoverUpdate();
+	void GameoverDrow2DFront();
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -84,4 +94,16 @@ private: // メンバ変数
 	int GameScore_ = 0;
 	int Playerlife_ = 3;
 	DebugText* debugtext_ = nullptr;
+	//
+	int SceneMode_ = 1;
+	//
+	uint32_t textureHandelTitle_ = 0;
+	Sprite* spriteTitle_ = nullptr;
+	//
+	uint32_t textureHandelGameover_ = 0;
+	Sprite* spriteGameover_ = nullptr;
+	//Enter
+	uint32_t textureHandelEnter_ = 0;
+	Sprite* spriteEnter_ = nullptr;
+	int EnterTimer = 0;
 };
