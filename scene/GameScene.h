@@ -43,8 +43,8 @@ public: // メンバ関数
 	void EnemyUpdate();
 	void EnemyMove();
 	void EnemyBorn();
-	void Collision();
-	void CollisionPlayerEnemy();
+	 void Collision();
+	 void CollisionPlayerEnemy();
 	void CollisionBeem();
 	//
 	void GamePlayStart();
@@ -69,28 +69,28 @@ private: // メンバ変数
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
-	//Bg
+	// Bg
 	uint32_t textureHandelBg_ = 0;
 	Sprite* spriteBg_ = nullptr;
 	ViewProjection viewprojection_;
-	//stage
+	// stage
 	uint32_t textureHandleStage_ = 0;
 	Model* modelstage_ = nullptr;
 	WorldTransform worldTransformStage_;
-	//Player
+	// Player
 	uint32_t textureHandlePlayer_ = 0;
 	Model* modelPlayer_ = nullptr;
 	WorldTransform worldTransformPlayer_;
 	// Beem
 	uint32_t textureHandleBeem_ = 0;
 	Model* modelBeem_ = nullptr;
-	WorldTransform worldTransformBeem_;
-	int BeemFlag_ = 0;
+	WorldTransform worldTransformBeem_[10];
+	int BeemFlag_[10] = {};
 	// Enemy
 	uint32_t textureHandleEnemy_ = 0;
 	Model* modelEnemy_ = nullptr;
-	WorldTransform worldTransformEnemy_;
-	int EnemyFlag_ = 0;
+	WorldTransform worldTransformEnemy_[10];
+	int EnemyFlag_[10] = {};
 	int GameScore_ = 0;
 	int Playerlife_ = 3;
 	DebugText* debugtext_ = nullptr;
@@ -102,8 +102,11 @@ private: // メンバ変数
 	//
 	uint32_t textureHandelGameover_ = 0;
 	Sprite* spriteGameover_ = nullptr;
-	//Enter
+	// Enter
 	uint32_t textureHandelEnter_ = 0;
 	Sprite* spriteEnter_ = nullptr;
 	int EnterTimer = 0;
+	int BeemTimer = 0;
+	float enmeyspeed_[10] = {};
 };
+

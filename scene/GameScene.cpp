@@ -55,13 +55,19 @@ void GameScene::Initialize() {
 	//Beem
 	textureHandleBeem_ = TextureManager::Load("beam.png");
 	modelBeem_ = Model::Create();
-	worldTransformBeem_.scale_ = {0.3f, 0.3f, 0.3f};
-	worldTransformBeem_.Initialize();
+	for (int i = 0; i < 10; i++) {
+		worldTransformBeem_[i].scale_ = {0.3f, 0.3f, 0.3f};
+		worldTransformBeem_[i].Initialize();
+	}
+	
 	//Enemy
 	textureHandleEnemy_ = TextureManager::Load("enemy.png");
 	modelEnemy_ = Model::Create();
-	worldTransformEnemy_.scale_ = {0.5f, 0.5f, 0.5f};
-	worldTransformEnemy_.Initialize();
+	for (int i = 0; i < 10; i++) {
+		worldTransformEnemy_[i].scale_ = {0.5f, 0.5f, 0.5f};
+		worldTransformEnemy_[i].Initialize();
+	}
+	
 	srand((unsigned int)time(NULL));
 	//Debug
 	debugtext_ = DebugText::GetInstance();
@@ -111,8 +117,11 @@ void GameScene::GamePlayStart() {
 	Playerlife_ = 3;
 	worldTransformPlayer_.rotation_.x = 0;
 	worldTransformPlayer_.translation_.x = 0;
-	BeemFlag_ = 0;
-	EnemyFlag_ = 0;
+	
+	for (int i = 0; i < 10; i++) {
+		EnemyFlag_[i] = 0;
+		BeemFlag_[i] = 0;
+	}
 }
     //Player Update
 void GameScene::PlayerUpdate() {
@@ -143,28 +152,46 @@ void GameScene::BeemUpdate() {
 	BeemMove();
 	BeemBorn();
 	// 変換行列を更新
-	worldTransformBeem_.matWorld_ = MakeAffineMatrix(
-	    worldTransformBeem_.scale_, worldTransformBeem_.rotation_,
-	    worldTransformBeem_.translation_);
-	// バッファ転送
-	worldTransformBeem_.TransferMatrix();
+	for (int i = 0; i < 10; i++) {
+		worldTransformBeem_[i].matWorld_ = MakeAffineMatrix(
+		    worldTransformBeem_[i].scale_, worldTransformBeem_[i].rotation_,
+		    worldTransformBeem_[i].translation_);
+		// バッファ転送
+		worldTransformBeem_[i].TransferMatrix();
+	}
+	
 }
 void GameScene::BeemMove() {
-	if (BeemFlag_ == 1) {
-		worldTransformBeem_.rotation_.x += 0.1f;
-	worldTransformBeem_.translation_.z += 0.4f;}
-	if (worldTransformBeem_.translation_.z > 40) {
-	BeemFlag_ = 0;
+	for (int i = 0; i < 10; i++) {
+		if (BeemFlag_[i] == 1) {
+			worldTransformBeem_[i].rotation_.x += 0.1f;
+			worldTransformBeem_[i].translation_.z += 0.4f;
+		}
+		if (worldTransformBeem_[i].translation_.z > 40) {
+			BeemFlag_[i] = 0;
+	}
+	
 	}
 }
 void GameScene::BeemBorn() {
-	if (BeemFlag_ == 0) {
-		if (input_->PushKey(DIK_SPACE)) {
-			worldTransformBeem_.translation_.x = worldTransformPlayer_.translation_.x;
-			worldTransformBeem_.translation_.y = worldTransformPlayer_.translation_.y;
-			worldTransformBeem_.translation_.z = worldTransformPlayer_.translation_.z;
-			BeemFlag_ = 1;
-		}
+	if (BeemTimer == 0) {
+	BeemTimer=1;
+	for (int i = 0; i < 10; i++) {
+			if (BeemFlag_[i] == 0) {
+				if (input_->PushKey(DIK_SPACE)) {
+					worldTransformBeem_[i].translation_.x = worldTransformPlayer_.translation_.x;
+					worldTransformBeem_[i].translation_.y = worldTransformPlayer_.translation_.y;
+					worldTransformBeem_[i].translation_.z = worldTransformPlayer_.translation_.z;
+					BeemFlag_[i] = 1;
+					break;
+				}
+			}
+	}
+	} else {
+	BeemTimer++;
+	if (BeemTimer > 30) {
+			BeemTimer = 0;
+	}
 	}
 }
 // EnemyUpdate
@@ -172,52 +199,93 @@ void GameScene::EnemyUpdate() {
 	EnemyMove();
 	EnemyBorn();
 	// 変換行列を更新
-	worldTransformEnemy_.matWorld_ = MakeAffineMatrix(
-	    worldTransformEnemy_.scale_, worldTransformEnemy_.rotation_,
-	    worldTransformEnemy_.translation_);
-	// バッファ転送
-	worldTransformEnemy_.TransferMatrix();
+	for (int i = 0; i < 10; i++) {
+		worldTransformEnemy_[i].matWorld_ = MakeAffineMatrix(
+		    worldTransformEnemy_[i].scale_, worldTransformEnemy_[i].rotation_,
+		    worldTransformEnemy_[i].translation_);
+		// バッファ転送
+		worldTransformEnemy_[i].TransferMatrix();
+	}
+	
 }
 void GameScene::EnemyMove() {
-	if (EnemyFlag_ == 1) {
-		worldTransformEnemy_.rotation_.x -= 0.1f;
-		worldTransformEnemy_.translation_.z -= 0.3f;
+	for (int i = 0; i < 10; i++) {
+		if (EnemyFlag_[i] == 1) {
+			worldTransformEnemy_[i].rotation_.x -= 0.1f + enmeyspeed_[i];
+			worldTransformEnemy_[i].translation_.z -= 0.3f;
+		}
+		if (worldTransformEnemy_[i].translation_.z < -5) {
+			EnemyFlag_[i] = 0;
+		}
 	}
-	if (worldTransformEnemy_.translation_.z < -5) {
-		EnemyFlag_ = 0;
-	}
+	
 }
 void GameScene::EnemyBorn() {
+	for (int i = 0; i < 10; i++) {
+		if (rand()%2==0) {
+			enmeyspeed_[i] = 0.1f;
+		} else {
+			enmeyspeed_[i] = -0.1f;
+		}
+		
+	}
 	int x = rand() % 80;
 	float x2 = (float)x / 10 - 4;
-	if (EnemyFlag_ == 0) {
-		worldTransformEnemy_.translation_.x = x2;
-		worldTransformEnemy_.translation_.z = 40.0f;
-		EnemyFlag_ = 1;
+	if (rand()%10==0) {
+		for (int i = 0; i < 10; i++) {
+			if (EnemyFlag_[i] == 0) {
+				worldTransformEnemy_[i].translation_.x = x2;
+				worldTransformEnemy_[i].translation_.z = 40.0f;
+				EnemyFlag_[i] = 1;
+				break;
+			}
+		}
 	}
+	
+
+	
 }
-//HitBox
+////HitBox
 void GameScene::Collision() { CollisionPlayerEnemy();
 	CollisionBeem();
 }
 void GameScene::CollisionPlayerEnemy() { 
-	if (EnemyFlag_==1) {
-		float dx = abs(worldTransformPlayer_.translation_.x - worldTransformEnemy_.translation_.x);
-		float dz = abs(worldTransformPlayer_.translation_.z - worldTransformEnemy_.translation_.z);
-		if (dx < 1 && dz < 1) {
-			EnemyFlag_ = 0;
-			Playerlife_ -= 1;
-		}
+	for (int i = 0; i < 10; i++) {
+		if (EnemyFlag_[i] == 1) {
+			float dx =
+			    abs(worldTransformPlayer_.translation_.x - worldTransformEnemy_[i].translation_.x);
+			float dz =
+			    abs(worldTransformPlayer_.translation_.z - worldTransformEnemy_[i].translation_.z);
+			if (dx < 1 && dz < 1) {
+				EnemyFlag_[i] = 0;
+				Playerlife_ -= 1;
+			}
+	}
+	
 	}
 }
 void GameScene::CollisionBeem() {
-	if (EnemyFlag_ == 1) {
-		float dx = abs(worldTransformBeem_.translation_.x - worldTransformEnemy_.translation_.x);
-		float dz = abs(worldTransformBeem_.translation_.z - worldTransformEnemy_.translation_.z);
-		if (dx < 1 && dz < 1) {
-			EnemyFlag_ = 0;
-			GameScore_ += 1;
+	
+	for (int i = 0; i < 10; i++) {
+	    if (EnemyFlag_[i] == 1) {
+			for (int k = 0; k < 10; k++) {
+				float dx = abs(
+				    worldTransformBeem_[k].translation_.x - worldTransformEnemy_[i].translation_.x);
+				float dz = abs(
+				    worldTransformBeem_[k].translation_.z - worldTransformEnemy_[i].translation_.z);
+				if (BeemFlag_[k]==1) {
+					
+					if (dx < 1 && dz < 1) {
+						EnemyFlag_[i] = 0;
+						BeemFlag_[k] = 0;
+						GameScore_ += 1;
+					}
+				}
+				
+			}
 		}
+			
+	
 	}
 }
     //描画
@@ -230,6 +298,10 @@ void GameScene::Draw() {
 		TitleDrow2DFront();
 		break;
 	case 2:
+		
+		GamePlayDrow2DFront();
+		GamePlayDrow2DBack();
+		GamePlayDrow3D();
 		GameoverDrow2DFront();
 		break;
 	}
@@ -277,12 +349,16 @@ void GameScene::GamePlayDrow3D() {
 	/// </summary>
 	modelstage_->Draw(worldTransformStage_, viewprojection_, textureHandleStage_);
 	modelPlayer_->Draw(worldTransformPlayer_, viewprojection_, textureHandlePlayer_);
-	if (BeemFlag_ == 1) {
-		modelBeem_->Draw(worldTransformBeem_, viewprojection_, textureHandleBeem_);
+	
+	for (size_t i = 0; i < 10; i++) {
+		if (EnemyFlag_[i] == 1) {
+			modelEnemy_->Draw(worldTransformEnemy_[i], viewprojection_, textureHandleEnemy_);
+			if (BeemFlag_[i] == 1) {
+				modelBeem_->Draw(worldTransformBeem_[i], viewprojection_, textureHandleBeem_);
+			}
+		}
 	}
-	if (EnemyFlag_ == 1) {
-		modelEnemy_->Draw(worldTransformEnemy_, viewprojection_, textureHandleEnemy_);
-	}
+	
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 
@@ -324,8 +400,8 @@ void GameScene::TitleDrow2DFront() {
 }
 void GameScene::GameoverDrow2DFront() {
 	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
-#pragma region 背景スプライト描画
-	// 背景スプライト描画前処理
+#pragma region 
+	
 	Sprite::PreDraw(commandList);
 
 	/// <summary>
