@@ -24,34 +24,45 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 	textureHandelBg_ = TextureManager::Load("bg.jpg");
 	spriteBg_ = Sprite::Create(textureHandelBg_, {0,0});
+	textureHandelSc_ = TextureManager::Load("number.png");
+	for (int i = 0; i < 5; i++) {
+		spriteSc_[i] = Sprite::Create(textureHandelSc_, {300.0f+i*26,0});
+	}
+	
 	textureHandelTitle_= TextureManager::Load("title.png");
 	spriteTitle_ = Sprite::Create(textureHandelTitle_, {0, 0});
+	textureHandelScore_ = TextureManager::Load("score.png");
+	spriteScore_ = Sprite::Create(textureHandelScore_, {100, 0});
 	textureHandelGameover_ = TextureManager::Load("gameover.png");
 	spriteGameover_ = Sprite::Create(textureHandelGameover_, {0, 0});
 	textureHandelEnter_ = TextureManager::Load("enter.png");
 	spriteEnter_ = Sprite::Create(textureHandelEnter_, {420, 430});
 	//
+	SoundDetaHandelTitleBGM_ = audio_->LoadWave("Audio/Ring05.wav");
+	SoundDetaHandelGamePlayBGM_ = audio_->LoadWave("Audio/Ring08.wav");
+    SoundDetaHandelGameoverBGM_ = audio_->LoadWave("Audio/Ring09.wav");
+	SoundDetaHandelEnemyHitSE_ = audio_->LoadWave("Audio/chord.wav");
+	SoundDetaHandelPlayerHitSE_ = audio_->LoadWave("Audio/tada.wav");
+	SoundHandelBGM_ = audio_->PlayWave(SoundDetaHandelTitleBGM_,true);
+	//
 	viewprojection_.translation_.y = 1;
 	viewprojection_.translation_.z = -6;
 	viewprojection_.Initialize();
 	//stage create
-	textureHandleStage_ = TextureManager::Load("stage.jpg");
+	textureHandleStage_ = TextureManager::Load("stage2.jpg");
 	modelstage_ = Model::Create();
-	worldTransformStage_.Initialize();
-	//ステージ位置変更
-	worldTransformStage_.translation_ = {0, -1.5f, 0};
-	worldTransformStage_.scale_ = {4.5f, 1, 40};
-	//変換行列を更新
-	worldTransformStage_.matWorld_ = MakeAffineMatrix(
-	    worldTransformStage_.scale_, worldTransformStage_.rotation_,
-	    worldTransformStage_.translation_);
-	//バッファ転送
-	worldTransformStage_.TransferMatrix();
+	for (int  i = 0; i < 20; i++) {
+		worldTransformStage_[i].Initialize();
+	}
 	//ぷれいやー
 	textureHandlePlayer_ = TextureManager::Load("player.png");
 	modelPlayer_ = Model::Create();
 	worldTransformPlayer_.scale_ = {0.5f, 0.5f, 0.5f};
 	worldTransformPlayer_.Initialize();
+	for (int i = 0; i < 3; i++) {
+		spritelife_[i] = Sprite::Create(textureHandlePlayer_, {800.0f + i * 60, 0});
+		spritelife_[i]->SetSize({40, 40});
+	}
 	//Beem
 	textureHandleBeem_ = TextureManager::Load("beam.png");
 	modelBeem_ = Model::Create();
@@ -82,6 +93,7 @@ void GameScene::Update() {
 	switch (SceneMode_) {
 	case 0:
 		GamePlayUpdate();
+		StageUpdate();
 		break;
 	case 1:
 		TitleUpdate();
@@ -93,31 +105,50 @@ void GameScene::Update() {
 	 
 }
 void GameScene::GamePlayUpdate() {
+	GameTimer_++;
 	PlayerUpdate();
 	BeemUpdate();
 	EnemyUpdate();
 	Collision();
+	
 	if (Playerlife_ == 0) {
 		SceneMode_ = 2;
+		// BGMchnge
+		audio_->StopWave(SoundHandelBGM_);
+		SoundHandelBGM_ = audio_->PlayWave(SoundDetaHandelGameoverBGM_, true);
 	}
 }
 void GameScene::TitleUpdate() {
+	GamePlayStart();
 	if (input_->TriggerKey(DIK_RETURN)) {
 		SceneMode_ = 0;
+		//BGMchnge
+		audio_->StopWave(SoundHandelBGM_ );
+		SoundHandelBGM_ = audio_->PlayWave(SoundDetaHandelGamePlayBGM_, true);
 	}
 }
 void GameScene::GameoverUpdate() {
-	GamePlayStart();
+	
 	if (input_->TriggerKey(DIK_RETURN)) {
 		SceneMode_ = 1;
+		// BGMchnge
+		audio_->StopWave(SoundHandelBGM_);
+		SoundHandelBGM_ = audio_->PlayWave(SoundDetaHandelTitleBGM_, true);
 	}
 }
 void GameScene::GamePlayStart() { 
 	GameScore_ = 0;
 	Playerlife_ = 3;
+	GameTimer_ = 0;
+	Playertimer_ = 0;
 	worldTransformPlayer_.rotation_.x = 0;
 	worldTransformPlayer_.translation_.x = 0;
-	
+	// player変換行列を更新
+	worldTransformPlayer_.matWorld_ = MakeAffineMatrix(
+	    worldTransformPlayer_.scale_, worldTransformPlayer_.rotation_,
+	    worldTransformPlayer_.translation_);
+	// playerバッファ転送
+	worldTransformPlayer_.TransferMatrix();
 	for (int i = 0; i < 10; i++) {
 		EnemyFlag_[i] = 0;
 		BeemFlag_[i] = 0;
@@ -139,7 +170,9 @@ void GameScene::PlayerUpdate() {
 	if (input_->PushKey(DIK_LEFT)) {
 		worldTransformPlayer_.translation_.x -= 0.1f;
 	}
-	
+	if (Playertimer_ >= 0) {
+		Playertimer_--;
+	}
 	// player変換行列を更新
 	worldTransformPlayer_.matWorld_ = MakeAffineMatrix(
 	    worldTransformPlayer_.scale_, worldTransformPlayer_.rotation_,
@@ -198,6 +231,7 @@ void GameScene::BeemBorn() {
 void GameScene::EnemyUpdate() {
 	EnemyMove();
 	EnemyBorn();
+	EnemyJump();
 	// 変換行列を更新
 	for (int i = 0; i < 10; i++) {
 		worldTransformEnemy_[i].matWorld_ = MakeAffineMatrix(
@@ -210,41 +244,79 @@ void GameScene::EnemyUpdate() {
 }
 void GameScene::EnemyMove() {
 	for (int i = 0; i < 10; i++) {
+
+		
 		if (EnemyFlag_[i] == 1) {
-			worldTransformEnemy_[i].rotation_.x -= 0.1f + enmeyspeed_[i];
+			worldTransformEnemy_[i].rotation_.x -= 0.1f ;
 			worldTransformEnemy_[i].translation_.z -= 0.3f;
+			worldTransformEnemy_[i].translation_.x += enmeyspeed_[i];
+			if (worldTransformEnemy_[i].translation_.x >= 4 ) {
+				enmeyspeed_[i]=-0.1f;
+				
+			} if (worldTransformEnemy_[i].translation_.x <= -4) {
+				enmeyspeed_[i] = 0.1f;	                               
+			}
 		}
-		if (worldTransformEnemy_[i].translation_.z < -5) {
+		if (worldTransformEnemy_[i].translation_.z < -5&&EnemyFlag_[i] != 2) {
 			EnemyFlag_[i] = 0;
 		}
 	}
 	
 }
 void GameScene::EnemyBorn() {
-	for (int i = 0; i < 10; i++) {
-		if (rand()%2==0) {
-			enmeyspeed_[i] = 0.1f;
-		} else {
-			enmeyspeed_[i] = -0.1f;
-		}
-		
-	}
+	
 	int x = rand() % 80;
 	float x2 = (float)x / 10 - 4;
 	if (rand()%10==0) {
 		for (int i = 0; i < 10; i++) {
+		
+				
+			
 			if (EnemyFlag_[i] == 0) {
 				worldTransformEnemy_[i].translation_.x = x2;
+				worldTransformEnemy_[i].translation_.y = 0;
 				worldTransformEnemy_[i].translation_.z = 40.0f;
 				EnemyFlag_[i] = 1;
+				if (rand() % 2 == 0) {
+					enmeyspeed_[i] = 0.1f;
+				} else {
+					enmeyspeed_[i] = -0.1f;
+				}
 				break;
 			}
 		}
 	}
-	
-
-	
 }
+void GameScene::EnemyJump() {
+	for (int i = 0; i < 10; i++) {
+		if (EnemyFlag_[i]==2) {
+			worldTransformEnemy_[i].translation_.y += enemyJumpSpeed_[i];
+			enemyJumpSpeed_[i] -= 0.1f;
+			worldTransformEnemy_[i].translation_.z -= enemyJumpSpeed_[i]*4;
+			if (worldTransformEnemy_[i].translation_.y < -5) {
+				EnemyFlag_[i] = 0;
+			}
+		}
+	}
+
+}
+
+void GameScene::StageUpdate() {
+	for (int i = 0; i < 20; i++) {
+		worldTransformStage_[i].translation_.z -= 0.1f;
+		if (worldTransformStage_[i].translation_.z < -5) {
+			worldTransformStage_[i].translation_.z += 40;
+			// 変換行列を更新
+			worldTransformStage_[i].matWorld_ = MakeAffineMatrix(
+			    worldTransformStage_[i].scale_, worldTransformStage_[i].rotation_,
+			    worldTransformStage_[i].translation_);
+			// バッファ転送
+			worldTransformStage_[i].TransferMatrix();
+		}
+
+	}
+}
+
 ////HitBox
 void GameScene::Collision() { CollisionPlayerEnemy();
 	CollisionBeem();
@@ -257,8 +329,10 @@ void GameScene::CollisionPlayerEnemy() {
 			float dz =
 			    abs(worldTransformPlayer_.translation_.z - worldTransformEnemy_[i].translation_.z);
 			if (dx < 1 && dz < 1) {
+				Playertimer_ = 60;
 				EnemyFlag_[i] = 0;
 				Playerlife_ -= 1;
+				audio_->PlayWave(SoundDetaHandelPlayerHitSE_);
 			}
 	}
 	
@@ -276,9 +350,11 @@ void GameScene::CollisionBeem() {
 				if (BeemFlag_[k]==1) {
 					
 					if (dx < 1 && dz < 1) {
-						EnemyFlag_[i] = 0;
+						EnemyFlag_[i] = 2;
+						enemyJumpSpeed_[i]=1;
 						BeemFlag_[k] = 0;
 						GameScore_ += 1;
+						audio_->PlayWave(SoundDetaHandelEnemyHitSE_);
 					}
 				}
 				
@@ -318,20 +394,12 @@ void GameScene::Draw() {
 }
 void GameScene::GamePlayDrow2DBack() {
 #pragma region 前景スプライト描画
+	DrowScore();
 	// 前景スプライト描画前処理
 	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
 	Sprite::PreDraw(commandList);
-	/// <summary>
-	/// ここに前景スプライトの描画処理を追加できる
-	/// </summary>
-	/// // score
-	char str[100];
-	char Lstr[100];
-	sprintf_s(str, "SCORE:%d", GameScore_);
-	debugtext_->Print(str, 10, 10, 2);
-	sprintf_s(Lstr, "LIFE:%d", Playerlife_);
-	debugtext_->Print(Lstr, 900, 10, 2);
-	debugtext_->DrawAll();
+	
+	
 	// スプライト描画後処理
 	Sprite::PostDraw();
 
@@ -347,16 +415,32 @@ void GameScene::GamePlayDrow3D() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	modelstage_->Draw(worldTransformStage_, viewprojection_, textureHandleStage_);
-	modelPlayer_->Draw(worldTransformPlayer_, viewprojection_, textureHandlePlayer_);
+	// ステージ位置変更
+	for (int i = 0; i < 20; i++) {
+		worldTransformStage_[i].translation_ = {0, -1.5f, 2.0f*i-5};
+		worldTransformStage_[i].scale_ = {4.5f, 1, 1};
+		// 変換行列を更新
+		worldTransformStage_[i].matWorld_ = MakeAffineMatrix(
+		    worldTransformStage_[i].scale_, worldTransformStage_[i].rotation_,
+		    worldTransformStage_[i].translation_);
+		// バッファ転送
+		worldTransformStage_[i].TransferMatrix();
+		modelstage_->Draw(worldTransformStage_[i], viewprojection_, textureHandleStage_);
+	}
+	if (Playertimer_%4<2) {
+		modelPlayer_->Draw(worldTransformPlayer_, viewprojection_, textureHandlePlayer_);
+	}
+	
 	
 	for (size_t i = 0; i < 10; i++) {
-		if (EnemyFlag_[i] == 1) {
-			modelEnemy_->Draw(worldTransformEnemy_[i], viewprojection_, textureHandleEnemy_);
-			if (BeemFlag_[i] == 1) {
-				modelBeem_->Draw(worldTransformBeem_[i], viewprojection_, textureHandleBeem_);
+			if (EnemyFlag_[i] == 1 || EnemyFlag_[i] == 2) {
+				modelEnemy_->Draw(worldTransformEnemy_[i], viewprojection_, textureHandleEnemy_);
+				if (BeemFlag_[i] == 1) {
+					modelBeem_->Draw(worldTransformBeem_[i], viewprojection_, textureHandleBeem_);
+				}
 			}
-		}
+		
+		
 	}
 	
 	// 3Dオブジェクト描画後処理
@@ -364,11 +448,12 @@ void GameScene::GamePlayDrow3D() {
 
 }
 void GameScene::GamePlayDrow2DFront() {
+	
 	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
 #pragma region 背景スプライト描画
 	// 背景スプライト描画前処理
 	Sprite::PreDraw(commandList);
-
+	
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
@@ -398,12 +483,33 @@ void GameScene::TitleDrow2DFront() {
 	// 深度バッファクリア
 	dxCommon_->ClearDepthBuffer();
 }
+void GameScene::DrowScore() {
+	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
+	Sprite::PreDraw(commandList);
+	int eachnum[5] = {};
+	int num = GameScore_;
+	int keta = 10000;
+	for (int i = 0; i < 5; i++) {
+		eachnum[i] = num / keta;
+		num = num % keta;
+		keta = keta / 10;
+	}
+	for (int i = 0; i < Playerlife_; i++) {
+		spritelife_[i]->Draw();
+	}
+	for (int i = 0; i < 5; i++) {
+		spriteSc_[i]->SetSize({32, 64});
+		spriteSc_[i]->SetTextureRect({32.0f * eachnum[i], 0}, {32, 64});
+		spriteSc_[i]->Draw();
+	}
+	spriteScore_->Draw();
+	Sprite::PostDraw();
+	dxCommon_->ClearDepthBuffer();
+}
 void GameScene::GameoverDrow2DFront() {
 	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
 #pragma region 
-	
 	Sprite::PreDraw(commandList);
-
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
