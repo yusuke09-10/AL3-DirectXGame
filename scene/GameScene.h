@@ -8,6 +8,7 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "Stage.h"
 
 /// <summary>
 /// ゲームシーン
@@ -48,4 +49,6 @@ private: // メンバ変数
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	Stage* stage_ = nullptr;
+	ViewProjection viewprojection_;
 };
