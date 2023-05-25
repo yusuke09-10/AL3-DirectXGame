@@ -83,7 +83,17 @@ void GameScene::Initialize() {
 	//Debug
 	debugtext_ = DebugText::GetInstance();
 	debugtext_->Initialize();
-}
+	for (int i = 0; i < 20; i++) {
+		worldTransformStage_[i].translation_ = {0, -1.5f, 2.0f * i - 5};
+		worldTransformStage_[i].scale_ = {4.5f, 1, 1};
+		// 変換行列を更新
+		worldTransformStage_[i].matWorld_ = MakeAffineMatrix(
+		    worldTransformStage_[i].scale_, worldTransformStage_[i].rotation_,
+		    worldTransformStage_[i].translation_);
+		// バッファ転送
+		worldTransformStage_[i].TransferMatrix();
+	}
+	}
 //更新
 void GameScene::Update() {
 	EnterTimer++;
@@ -93,7 +103,6 @@ void GameScene::Update() {
 	switch (SceneMode_) {
 	case 0:
 		GamePlayUpdate();
-		StageUpdate();
 		break;
 	case 1:
 		TitleUpdate();
@@ -110,7 +119,7 @@ void GameScene::GamePlayUpdate() {
 	BeemUpdate();
 	EnemyUpdate();
 	Collision();
-	
+	StageUpdate();
 	if (Playerlife_ == 0) {
 		SceneMode_ = 2;
 		// BGMchnge
@@ -222,7 +231,7 @@ void GameScene::BeemBorn() {
 	}
 	} else {
 	BeemTimer++;
-	if (BeemTimer > 30) {
+	if (BeemTimer > 10) {
 			BeemTimer = 0;
 	}
 	}
@@ -257,7 +266,7 @@ void GameScene::EnemyMove() {
 				enmeyspeed_[i] = 0.1f;	                               
 			}
 		}
-		if (worldTransformEnemy_[i].translation_.z < -5&&EnemyFlag_[i] != 2) {
+		if (worldTransformEnemy_[i].translation_.z < -5) {
 			EnemyFlag_[i] = 0;
 		}
 	}
@@ -306,13 +315,14 @@ void GameScene::StageUpdate() {
 		worldTransformStage_[i].translation_.z -= 0.1f;
 		if (worldTransformStage_[i].translation_.z < -5) {
 			worldTransformStage_[i].translation_.z += 40;
+		}
 			// 変換行列を更新
 			worldTransformStage_[i].matWorld_ = MakeAffineMatrix(
 			    worldTransformStage_[i].scale_, worldTransformStage_[i].rotation_,
 			    worldTransformStage_[i].translation_);
 			// バッファ転送
 			worldTransformStage_[i].TransferMatrix();
-		}
+		
 
 	}
 }
@@ -417,16 +427,10 @@ void GameScene::GamePlayDrow3D() {
 	/// </summary>
 	// ステージ位置変更
 	for (int i = 0; i < 20; i++) {
-		worldTransformStage_[i].translation_ = {0, -1.5f, 2.0f*i-5};
-		worldTransformStage_[i].scale_ = {4.5f, 1, 1};
-		// 変換行列を更新
-		worldTransformStage_[i].matWorld_ = MakeAffineMatrix(
-		    worldTransformStage_[i].scale_, worldTransformStage_[i].rotation_,
-		    worldTransformStage_[i].translation_);
-		// バッファ転送
-		worldTransformStage_[i].TransferMatrix();
 		modelstage_->Draw(worldTransformStage_[i], viewprojection_, textureHandleStage_);
 	}
+		
+	
 	if (Playertimer_%4<2) {
 		modelPlayer_->Draw(worldTransformPlayer_, viewprojection_, textureHandlePlayer_);
 	}
