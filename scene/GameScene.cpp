@@ -19,14 +19,17 @@ void GameScene::Initialize() {
 	viewprojection_.Initialize();
 	stage_ = new Stage();
 	player_ = new Player();
+	beam_ = new Beam();
 	stage_->Initialize(viewprojection_);
 	player_->Initialize(viewprojection_);
+	beam_->Initialize(viewprojection_,player_);
 	
 }
 
 void GameScene::Update() { 
 	stage_->Update(); 
     player_->Update();
+	beam_->Update();
 }
 
 void GameScene::Draw() {
@@ -58,6 +61,7 @@ void GameScene::Draw() {
 	/// </summary>
 	stage_->Drow3D();
 	player_->Drow3D();
+	beam_->Drow3D();
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion

@@ -18,9 +18,12 @@ public:
 	void Update();
 	void Drow3D();
 
-	ViewProjection viewprojection_;
+	float GetX() { return worldTransformPlayer_.translation_.x; }
 	uint32_t textureHandlePlayer_ = 0;
 	Model* modelPlayer_ = nullptr;
 	WorldTransform worldTransformPlayer_;
 	Input *input_ = nullptr;
+
+private:
+	ViewProjection viewprojection_;
 };

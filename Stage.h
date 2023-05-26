@@ -21,9 +21,12 @@ public:
 	void Draw2DFar();
 	uint32_t textureHandelBg_ = 0;
 	Sprite* spriteBg_ = nullptr;
-	ViewProjection viewprojection_;
+	
 
 	uint32_t textureHandleStage_ = 0;
 	Model* modelstage_ = nullptr;
 	WorldTransform worldTransformStage_;
+
+private:
+	ViewProjection viewprojection_;
 };
