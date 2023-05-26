@@ -4,7 +4,10 @@
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() { delete stage_; }
+GameScene::~GameScene() {
+	delete stage_;
+	delete player_;
+}
 
 void GameScene::Initialize() {
 
@@ -15,11 +18,16 @@ void GameScene::Initialize() {
 	viewprojection_.translation_.z = -6;
 	viewprojection_.Initialize();
 	stage_ = new Stage();
+	player_ = new Player();
 	stage_->Initialize(viewprojection_);
+	player_->Initialize(viewprojection_);
 	
 }
 
-void GameScene::Update() { stage_->Update(); }
+void GameScene::Update() { 
+	stage_->Update(); 
+    player_->Update();
+}
 
 void GameScene::Draw() {
 
@@ -49,6 +57,7 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	stage_->Drow3D();
+	player_->Drow3D();
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
