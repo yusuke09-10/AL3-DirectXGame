@@ -7,6 +7,8 @@ GameScene::GameScene() {}
 GameScene::~GameScene() {
 	delete stage_;
 	delete player_;
+	delete enemy_;
+	delete beam_;
 }
 
 void GameScene::Initialize() {
@@ -20,8 +22,10 @@ void GameScene::Initialize() {
 	stage_ = new Stage();
 	player_ = new Player();
 	beam_ = new Beam();
+	enemy_ = new Enemy();
 	stage_->Initialize(viewprojection_);
 	player_->Initialize(viewprojection_);
+	enemy_->Initialize(viewprojection_);
 	beam_->Initialize(viewprojection_,player_);
 	
 }
@@ -30,6 +34,7 @@ void GameScene::Update() {
 	stage_->Update(); 
     player_->Update();
 	beam_->Update();
+	enemy_->Update();
 }
 
 void GameScene::Draw() {
@@ -62,6 +67,7 @@ void GameScene::Draw() {
 	stage_->Drow3D();
 	player_->Drow3D();
 	beam_->Drow3D();
+	enemy_->Drow3D();
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion

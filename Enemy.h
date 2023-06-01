@@ -1,31 +1,29 @@
 #pragma once
 #include "DirectXCommon.h"
 #include "Input.h"
+#include "MathUtilityForText.h"
 #include "Model.h"
+#include "Player.h"
 #include "SafeDelete.h"
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include "MathUtilityForText.h"
-#include "Player.h"
-
-class Beam {
+class Enemy {
 public:
-	Beam();
+	Enemy();
 
-	~Beam();
+	~Enemy();
 
-	void Initialize(ViewProjection viewprojection_, Player* player);
+	void Initialize(ViewProjection viewprojection_);
 
 	void Update();
 	void Drow3D();
 	void Born();
 	void Move();
-	// Bea
-	Player* player_ = nullptr;
-	uint32_t textureHandleBeam_ = 0;
-	Model* modelBeam_ = nullptr;
-	WorldTransform worldTransformBeam_;
+	// en
+	uint32_t textureHandleEnemy_ = 0;
+	Model* modelEnemy_ = nullptr;
+	WorldTransform worldTransformEnemy_;
 	Input* input_ = nullptr;
 	int aliveFlag_ = 0;
 
