@@ -20,11 +20,15 @@ public:
 	void Drow3D();
 	void Born();
 	void Move();
+	void Hit() { aliveFlag_ = 0; }
 	// en
 	uint32_t textureHandleEnemy_ = 0;
 	Model* modelEnemy_ = nullptr;
 	WorldTransform worldTransformEnemy_;
 	Input* input_ = nullptr;
+	float GetX() { return worldTransformEnemy_.translation_.x; }
+	float GetZ() { return worldTransformEnemy_.translation_.z; }
+	int GetFlag() { return aliveFlag_; }
 	int aliveFlag_ = 0;
 
 private:

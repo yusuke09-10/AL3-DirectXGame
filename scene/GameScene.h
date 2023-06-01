@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "Beam.h"
 #include "Enemy.h"
+#include "DebugText.h"
 
 /// <summary>
 /// ゲームシーン
@@ -48,7 +49,9 @@ private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
-
+	void Collision();
+	void CollisionPlayerEnemy();
+	void CollisionBeem();
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
@@ -56,5 +59,8 @@ private: // メンバ変数
 	Player* player_ = nullptr;
 	Beam* beam_ = nullptr;
 	Enemy * enemy_ = nullptr;
+	DebugText* debugtext_ = nullptr;
 	ViewProjection viewprojection_;
+	int GameScore_ = 0;
+	int Playerlife_ = 3;
 };

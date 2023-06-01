@@ -19,6 +19,7 @@ public:
 	void Drow3D();
 
 	float GetX() { return worldTransformPlayer_.translation_.x; }
+	float GetZ() { return worldTransformPlayer_.translation_.z; }
 	uint32_t textureHandlePlayer_ = 0;
 	Model* modelPlayer_ = nullptr;
 	WorldTransform worldTransformPlayer_;

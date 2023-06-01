@@ -36,12 +36,12 @@ void Beam::Move() {
 		}
 		if (worldTransformBeam_.translation_.z > 40) {
 		    aliveFlag_ = 0;
-		    worldTransformBeam_.translation_.z = 0;
 		}
 }
 void Beam::Born() {
 
 	    if (aliveFlag_ == 0) {
+		    worldTransformBeam_.translation_.z = 0;
 		    if (input_->PushKey(DIK_SPACE)) {
 			     worldTransformBeam_.translation_.x = player_->GetX();
 			    aliveFlag_ = 1;
