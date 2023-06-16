@@ -20,6 +20,7 @@ public:
 	void Drow3D();
 	void Born();
 	void Move();
+	void Strat();
 	void Hit() { aliveFlag_ = 0; }
 	// en
 	uint32_t textureHandleEnemy_ = 0;
@@ -30,6 +31,7 @@ public:
 	float GetZ() { return worldTransformEnemy_.translation_.z; }
 	int GetFlag() { return aliveFlag_; }
 	int aliveFlag_ = 0;
+	float Xspeed = 0;
 
 private:
 	ViewProjection viewprojection_;

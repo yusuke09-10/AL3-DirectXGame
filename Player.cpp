@@ -41,3 +41,5 @@ void Player::Drow3D() {
 	modelPlayer_->Draw(worldTransformPlayer_, viewprojection_, textureHandlePlayer_);
 
 }
+
+void Player::Strat() { worldTransformPlayer_.translation_.x = 0; }

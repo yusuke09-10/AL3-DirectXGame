@@ -20,7 +20,6 @@ void Beam::Initialize(ViewProjection viewprojection, Player* player) {
 
 void Beam::Update(){
 	Move();
-	Born();
 	worldTransformBeam_.matWorld_ = MakeAffineMatrix(
 	    worldTransformBeam_.scale_, worldTransformBeam_.rotation_,
 	    worldTransformBeam_.translation_);
@@ -38,14 +37,14 @@ void Beam::Move() {
 		    aliveFlag_ = 0;
 		}
 }
+void Beam::Strat() { aliveFlag_ = 0;}
 void Beam::Born() {
 
 	    if (aliveFlag_ == 0) {
 		    worldTransformBeam_.translation_.z = 0;
-		    if (input_->PushKey(DIK_SPACE)) {
 			     worldTransformBeam_.translation_.x = player_->GetX();
 			    aliveFlag_ = 1;
-		    }
+		    
 	    }
 }	    
 		    void Beam::Drow3D() {

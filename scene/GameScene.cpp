@@ -1,14 +1,11 @@
 #include "GameScene.h"
+
 #include "TextureManager.h"
 #include <cassert>
 
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
-	delete stage_;
-	delete player_;
-	delete enemy_;
-	delete beam_;
 }
 
 void GameScene::Initialize() {
@@ -19,56 +16,33 @@ void GameScene::Initialize() {
 	viewprojection_.translation_.y = 1;
 	viewprojection_.translation_.z = -6;
 	viewprojection_.Initialize();
-	stage_ = new Stage();
-	player_ = new Player();
-	beam_ = new Beam();
-	enemy_ = new Enemy();
-	stage_->Initialize(viewprojection_);
-	player_->Initialize(viewprojection_);
-	enemy_->Initialize(viewprojection_);
-	beam_->Initialize(viewprojection_,player_);
-	debugtext_ = DebugText::GetInstance();
-	debugtext_->Initialize();
-	
+    gameplay.Initialize(viewprojection_);
+	title.Initialize();
+	gameover.Initialize();
 }
 
 void GameScene::Update() { 
-	Collision();
-	stage_->Update(); 
-    player_->Update();
-	beam_->Update();
-	enemy_->Update();
-}
-void GameScene::Collision() {
-	CollisionPlayerEnemy();
-	CollisionBeem();
-}
-void GameScene::CollisionPlayerEnemy() {
+	int oldScene = SceneMode;
+	switch (SceneMode) {
+	case 0:
+		SceneMode = gameplay.Update();
+		break;
 	
-		if (enemy_->GetFlag()==1) {
-			float dx = abs(player_->GetX()- enemy_->GetX());
-			float dz = abs(player_->GetZ() - enemy_->GetZ());
-			if (dx < 1 && dz < 1) {
-				enemy_->Hit();
-			    Playerlife_ -= 1;
-			}
-		}
-	
-}
-void GameScene::CollisionBeem() {
-	    if (enemy_->GetFlag() == 1) {
-		    float dx = abs(beam_->GetX() - enemy_->GetX());
-		    float dz = abs(beam_->GetZ() - enemy_->GetZ());
-		    if (dx < 1 && dz < 1) {
-			    enemy_->Hit();
-			    beam_->Hit();
-			    GameScore_ += 1;
-		    }
-	    }
-	
-		
-	
-	
+     case 1:
+	SceneMode= title.Update();
+	break;
+	 case 2:
+	SceneMode= gameover.Update();
+	break;
+   }
+	 if (oldScene!=SceneMode) {
+	switch (SceneMode) {
+	case 0:
+		gameplay.Start();
+		break;
+	}
+
+	 }
 }
 void GameScene::Draw() {
 
@@ -82,8 +56,14 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
-	stage_->Draw2DFar();
-	
+	switch (SceneMode) {
+	case 0:
+		gameplay.Drow2DFar();
+		break;
+	case 2:
+		gameplay.Drow2DFar();
+		break;
+	}
 	// スプライト描画後処理
 	Sprite::PostDraw();
 	// 深度バッファクリア
@@ -97,10 +77,14 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	stage_->Drow3D();
-	player_->Drow3D();
-	beam_->Drow3D();
-	enemy_->Drow3D();
+	switch (SceneMode) {
+	case 0:
+		gameplay.Drow3D();
+		break;
+	case 2:
+		gameplay.Drow3D();
+		break;
+	}
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
@@ -112,13 +96,17 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
-	char str[100];
-	char Lstr[100];
-	sprintf_s(str, "SCORE:%d", GameScore_);
-	debugtext_->Print(str, 10, 10, 2);
-	sprintf_s(Lstr, "LIFE:%d", Playerlife_);
-	debugtext_->Print(Lstr, 900, 10, 2);
-	debugtext_->DrawAll();
+	switch (SceneMode) {
+	case 0:
+		gameplay.Drow2DNear();
+		break;
+	case 1:
+		title.Drow2DNear();
+		break;
+	case 2:
+		gameover.Drow2DNear();
+		break;
+	}
 	// スプライト描画後処理
 	Sprite::PostDraw();
 

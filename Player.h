@@ -17,7 +17,7 @@ public:
 
 	void Update();
 	void Drow3D();
-
+	void Strat();
 	float GetX() { return worldTransformPlayer_.translation_.x; }
 	float GetZ() { return worldTransformPlayer_.translation_.z; }
 	uint32_t textureHandlePlayer_ = 0;

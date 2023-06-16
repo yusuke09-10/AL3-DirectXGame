@@ -21,6 +21,7 @@ public:
 	void Drow3D();
 	void Born();
 	void Move();
+	void Strat();
 	void Hit() { aliveFlag_ = 0; }
 	// Bea
 	Player* player_ = nullptr;

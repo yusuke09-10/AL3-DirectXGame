@@ -8,12 +8,9 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include "Stage.h"
-#include "Player.h"
-#include "Beam.h"
-#include "Enemy.h"
-#include "DebugText.h"
-
+#include "Gameplay.h"
+#include "Title.h"
+#include "Gameover.h"
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -39,28 +36,24 @@ public: // メンバ関数
 	/// 毎フレーム処理
 	/// </summary>
 	void Update();
-
+	
 	/// <summary>
 	/// 描画
 	/// </summary>
 	void Draw();
-
-private: // メンバ変数
+     private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
-	void Collision();
-	void CollisionPlayerEnemy();
-	void CollisionBeem();
+	Gameplay gameplay;
+	Title title;
+	Gameover gameover;
+	int SceneMode = 1;
+	
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
-	Stage* stage_ = nullptr;
-	Player* player_ = nullptr;
-	Beam* beam_ = nullptr;
-	Enemy * enemy_ = nullptr;
-	DebugText* debugtext_ = nullptr;
+	
 	ViewProjection viewprojection_;
-	int GameScore_ = 0;
-	int Playerlife_ = 3;
+	
 };
