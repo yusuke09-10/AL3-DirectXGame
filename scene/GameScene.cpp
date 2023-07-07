@@ -40,8 +40,13 @@ void GameScene::Update() {
 	case 0:
 		gameplay.Start();
 		break;
+	case 1:
+		title.Strat();
+		break;
+	case 2:
+		gameover.Strat();
+		break;
 	}
-
 	 }
 }
 void GameScene::Draw() {

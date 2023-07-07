@@ -17,6 +17,7 @@ public:
 	Gameover();
 	~Gameover();
 	int Update();
+	void Strat();
 	void Initialize();
 	void Drow2DNear();
 	Input* input_ = nullptr;
@@ -25,6 +26,8 @@ public:
 	uint32_t textureHandelEnter_ = 0;
 	Sprite* spriteEnter_ = nullptr;
 	int EnterTimer = 0;
-
+	Audio* audio_ = nullptr;
+	uint32_t SoundDetaHandelBGM_ = 0;
+	uint32_t SoundHandelBGM_ = 0;
 
 };

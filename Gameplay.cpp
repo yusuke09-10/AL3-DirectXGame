@@ -25,6 +25,11 @@ void Gameplay::Initialize(ViewProjection viewprojection) {
 	for (int i = 0; i < 10; i++) {
 		enemys_[i] = new Enemy();
 	}
+	audio_ = Audio::GetInstance();
+	SoundDetaHandelBGM_ = audio_->LoadWave("Audio/Ring08.wav");
+	SoundDetaHandelEnemyHitSE_ = audio_->LoadWave("Audio/chord.wav");
+	SoundDetaHandelPlayerHitSE_ = audio_->LoadWave("Audio/tada.wav");
+	SoundHandelBGM_ = audio_->PlayWave(SoundDetaHandelBGM_, true);
 	input_ = Input::GetInstance();
 	stage_->Initialize(viewprojection_);
 	player_->Initialize(viewprojection_);
@@ -51,6 +56,7 @@ int Gameplay::Update() {
 	CollisionPlayerEnemy();
 	CollisionBeem();
 	if (Playerlife_==0) {
+		audio_->StopWave(SoundHandelBGM_);
 		return 2;
 	}
 	return 0;
@@ -85,6 +91,7 @@ void Gameplay::CollisionPlayerEnemy() {
 			float dx = abs(player_->GetX() - enemy->GetX());
 			float dz = abs(player_->GetZ() - enemy->GetZ());
 			if (dx < 1 && dz < 1) {
+				audio_->PlayWave(SoundDetaHandelPlayerHitSE_);
 				enemy->Hit();
 				Playerlife_ -= 1;
 			}
@@ -99,8 +106,9 @@ void Gameplay::CollisionBeem() {
 				float dx = abs(beam->GetX() - enemy->GetX());
 				float dz = abs(beam->GetZ() - enemy->GetZ());
 				if (dx < 1 && dz < 1) {
+					audio_->PlayWave(SoundDetaHandelEnemyHitSE_);
 					enemy->Hit();
-					beam->Hit();
+					beam->Hitr();
 					GameScore_ += 1;
 				}
 			}

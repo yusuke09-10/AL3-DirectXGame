@@ -22,7 +22,7 @@ public:
 	void Born();
 	void Move();
 	void Strat();
-	void Hit() { aliveFlag_ = 0; }
+	void Hitr() { aliveFlag_ = 0; }
 	// Bea
 	Player* player_ = nullptr;
 	uint32_t textureHandleBeam_ = 0;

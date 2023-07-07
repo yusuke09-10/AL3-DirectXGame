@@ -65,6 +65,7 @@ void Enemy::Born() {
 }
 void Enemy::Drow3D() {
 	if (aliveFlag_ == 1) {
-		    modelEnemy_->Draw(worldTransformEnemy_, viewprojection_, textureHandleEnemy_);
+	
+		modelEnemy_->Draw(worldTransformEnemy_, viewprojection_, textureHandleEnemy_);
 	}
 }

@@ -39,7 +39,12 @@ public:
 	int Playerlife_ = 3;
 	int shotTimer = 0;
 	int Get() { return Playerlife_; };
+	Audio* audio_ = nullptr;
+	uint32_t SoundDetaHandelBGM_ = 0;
+	uint32_t SoundHandelBGM_ = 0;
+	uint32_t SoundDetaHandelEnemyHitSE_ = 0;
+	uint32_t SoundDetaHandelPlayerHitSE_ = 0;
 	private:
 	ViewProjection viewprojection_;
-
+	    
 };
