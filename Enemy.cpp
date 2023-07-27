@@ -17,6 +17,7 @@ void Enemy::Initialize(ViewProjection viewprojection) {
 void Enemy::Update() {
 	Move();
 	Born();
+	Jump();
 	worldTransformEnemy_.matWorld_ = MakeAffineMatrix(
 	    worldTransformEnemy_.scale_, worldTransformEnemy_.rotation_,
 	    worldTransformEnemy_.translation_);
@@ -42,6 +43,18 @@ void Enemy::Move() {
 	
 }
 void Enemy::Strat() { aliveFlag_ = 0; }
+void Enemy::Jump() {
+	for (int i = 0; i < 10; i++) {
+		if (aliveFlag_ == 2) {
+			worldTransformEnemy_.translation_.y += JumpSpeed_;
+			JumpSpeed_ -= 0.1f;
+			worldTransformEnemy_.translation_.x -= Xspeed*4;
+			if (worldTransformEnemy_.translation_.y < -3) {
+				aliveFlag_ = 0;
+			}
+		}
+	}
+}
 void Enemy::Born() {
 	if (rand()%12==0) {
 
@@ -64,7 +77,7 @@ void Enemy::Born() {
 	}
 }
 void Enemy::Drow3D() {
-	if (aliveFlag_ == 1) {
+	if (aliveFlag_ == 1 || aliveFlag_ == 2) {
 	
 		modelEnemy_->Draw(worldTransformEnemy_, viewprojection_, textureHandleEnemy_);
 	}

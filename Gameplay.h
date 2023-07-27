@@ -27,9 +27,10 @@ public:
 	void Drow2DFar();
 	void CollisionPlayerEnemy();
 	void CollisionBeem();
+	void DrowScore();
 	void Start();
 	void Shot();
-	Stage* stage_ = nullptr;
+	Stage* stage_[20] = {};
 	Player* player_ = nullptr;
 	Beam* beams_[10] = {};
 	Enemy* enemys_[10] = {};
@@ -44,6 +45,13 @@ public:
 	uint32_t SoundHandelBGM_ = 0;
 	uint32_t SoundDetaHandelEnemyHitSE_ = 0;
 	uint32_t SoundDetaHandelPlayerHitSE_ = 0;
+	uint32_t textureHandelSc_ = 0;
+	Sprite* spriteSc_[5] = {};
+	uint32_t textureHandelScore_ = 0;
+	Sprite* spriteScore_ = nullptr;
+	uint32_t textureHandellife_ = 0;
+	Sprite* spritelife_[3] = {};
+	int playerTimer = 0;
 	private:
 	ViewProjection viewprojection_;
 	    

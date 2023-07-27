@@ -17,6 +17,7 @@ public:
 	void Initialize(ViewProjection viewprojection_);
 
 	void Update();
+	void StageUpdate();
 	void Drow3D();
 	void Draw2DFar();
 	uint32_t textureHandelBg_ = 0;
@@ -25,7 +26,7 @@ public:
 
 	uint32_t textureHandleStage_ = 0;
 	Model* modelstage_ = nullptr;
-	WorldTransform worldTransformStage_;
+	WorldTransform worldTransformStage_[20];
 
 private:
 	ViewProjection viewprojection_;
