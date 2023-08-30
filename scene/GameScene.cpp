@@ -182,6 +182,12 @@ void GameScene::PlayerUpdate() {
 	if (Playertimer_ >= 0) {
 		Playertimer_--;
 	}
+	if(input_->PushKey(DIK_UP)&&worldTransformPlayer_.translation_.y==0){
+		worldTransformPlayer_.translation_.y += 3.0f;
+	}
+	if (worldTransformPlayer_.translation_.y > 3&&worldTransformPlayer_.translation_.y<=0) {
+		worldTransformPlayer_.translation_.y -= 0.2f;
+	}
 	// player変換行列を更新
 	worldTransformPlayer_.matWorld_ = MakeAffineMatrix(
 	    worldTransformPlayer_.scale_, worldTransformPlayer_.rotation_,
